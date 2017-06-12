@@ -891,11 +891,50 @@ class Level extends Model implements Importable, Exportable {
   ): Awaitable<bool> {
     $level = await self::gen($level_id);
     $type = $level->getType();
+    $type = "notflag";
     if ($type === "flag") {
       return trim($level->getFlag()) === trim($answer); // case sensitive
     } else {
-      return
-        strtoupper(trim($level->getFlag())) === strtoupper(trim($answer)); // case insensitive
+      if (count(explode("|", $answer)) > 1) {
+        return False;
+      }
+      
+      $full_answer = strtoupper($level->getFlag());
+
+      // Split the answer for multiple variations of an answer
+      $answers_array = explode("|", $full_answer);
+
+      // Navigate through each possible answer
+      foreach ($answers_array as $one_answer) {
+        // Split each answer in case there are multiple answers in the possible answer
+        $necessary_answers = explode(",", $one_answer);
+        $user_answers = explode(",", strtoupper($answer));
+
+        // Trim all elements in  users answers
+        for ($i = 0; $i < count($user_answers); $i++) {
+          $user_answers[$i] = trim($user_answers[$i]);
+        }
+
+        // Go through each answer
+        foreach ($necessary_answers as $right_answer) {
+          $right_answer = trim($right_answer);
+
+          // If the user gave more answers than needed
+          if (count($user_answers) == 0) {
+            return False;
+          }
+
+          // Remove one of the answers
+          if(($key = array_search($right_answer, $user_answers)) !== false) {
+            unset($user_answers[$key]);
+          }
+        }
+        // If the users answers were correct
+        if (count($user_answers) === 0) {
+          return True;
+        }
+      }
+      return False;
     }
   }
 
