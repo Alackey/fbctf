@@ -2973,11 +2973,11 @@ class AdminController extends Controller {
       if ($country->getEnabled()) {
         $highlighted_action = 'disable_country';
         $highlighted_color = 'highlighted--red country-enabled';
-        $current_status = 'DISABLED';
+        $current_status = 'DISABLE';
       } else {
         $highlighted_action = 'enable_country';
         $highlighted_color = 'highlighted--green country-disabled';
-        $current_status = 'ENABLED';
+        $current_status = 'ENABLE';
       }
 
       if (!$using_country) {
